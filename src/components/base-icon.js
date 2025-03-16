@@ -7,7 +7,8 @@ import {
   Feather,
   Fontisto,
   AntDesign,
-  SimpleLineIcons
+  SimpleLineIcons,
+  MaterialCommunityIcons
 } from '@expo/vector-icons'
   
 function BaseIcon ({ type, name, size, color, styles, customStyles }) {
@@ -99,6 +100,15 @@ function BaseIcon ({ type, name, size, color, styles, customStyles }) {
 
     case 'simplelineicons':
       icon = <SimpleLineIcons 
+          style={STYLES}
+          name={name ? name : null} 
+          size={size ? size : 25} 
+          color={color ? color : '#000'} 
+      />
+      break
+
+    case 'materialcommunityicons':
+      icon = <MaterialCommunityIcons 
           style={STYLES}
           name={name ? name : null} 
           size={size ? size : 25} 

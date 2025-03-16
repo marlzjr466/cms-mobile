@@ -69,6 +69,7 @@ function Main ({ navigation }) {
         child: host
           ? 'auth'
           : 'setup-host'
+          // : 'test'
       })
     }
 

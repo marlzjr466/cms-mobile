@@ -5,6 +5,7 @@ import { useStorage } from "./useStorage"
 import { useAuth } from "./useAuth"
 import { useScreenSize } from "./useScreenSize"
 import { useNetworkInfo } from "./usetNetworkInfo"
+import { useAddressReachable } from "./useAddressReacheble"
 
 export {
   useBLE,
@@ -13,5 +14,6 @@ export {
   useStorage,
   useAuth,
   useScreenSize,
-  useNetworkInfo
+  useNetworkInfo,
+  useAddressReachable
 }

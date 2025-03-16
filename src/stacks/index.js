@@ -6,6 +6,7 @@ import home from '@screens/home'
 import patients from '@screens/patients'
 import transactions from '@screens/transactions'
 import settings from '@screens/settings'
+import test from '@screens/test'
 
 const options = { headerShown: false }
 export default () => [
@@ -17,6 +18,11 @@ export default () => [
   {
     name: 'setup-host',
     component: setupHost,
+    options: options
+  },
+  {
+    name: 'test',
+    component: test,
     options: options
   },
   {

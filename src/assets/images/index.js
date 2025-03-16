@@ -13,4 +13,5 @@ export const images = {
   attendantIcon: require('./icon/attendant-icon.png'),
   patientIcon: require('./icon/patient-icon.png'),
   patientIcon2: require('./icon/patient-icon2.png'),
+  connecting: require('./icon/connecting.gif'),
 }

@@ -1,7 +1,11 @@
 import * as Animatable from 'react-native-animatable'
 
-export default function BaseModal ({ children, styles, customStyles }) {
+export default function BaseModal ({ children, styles, customStyles, visible }) {
   let STYLES = {}
+
+  if (!visible) {
+    return null
+  }
 
   if (styles) {
     STYLES = global.$rnStyle(styles)

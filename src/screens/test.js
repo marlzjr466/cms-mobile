@@ -1,112 +1,124 @@
-import { useEffect, memo, useState } from 'react'
-import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, View, Text, Button } from 'react-native'
-
-// hooks
-import { useBLE } from '@hooks/useBLE'
-
-// modals
-import DeviceModal from '@modals/DeviceConnection'
-
-function Index() {
-  const { metaStates, metaMutations, metaActions, metaGetters } = global.$reduxMeta.useMeta()
-  const meta = {
-    ...metaStates({
-      fullname: 'name/fullname',
-      name: 'name/name',
-
-      permissionEnabled: 'device-connection/permissionEnabled',
-      deviceModal: 'device-connection/deviceModal'
-    }),
-
-    ...metaMutations({
-      setName: 'name/SET_NAME'
-    }),
-
-    // ...metaActions('device-connection', [
-    //   'askPermission',
-    //   'showDeviceModal'
-    // ]),
-
-    // ...metaActions('name', [
-    //   'test',
-    // ]),
-
-    ...metaActions({
-      askPermission: 'device-connection/askPermission',
-      showDeviceModal: 'device-connection/showDeviceModal',
-
-      test: 'name/test'
-    }),
-
-    ...metaGetters({
-      gfns: 'name/getFullname'
-    })
-  }
-
-  const {
-		requestPermissions,
-		scanForPeripherals,
-		allDevices,
-		connectToDevice,
-		connectedDevice,
-		printer,
-		disconnectFromDevice
-	} = useBLE()
-
-  // use effects
-  useEffect(() => {
-		const askPermission = async () => {
-      const permission = await requestPermissions()
-
-      if (permission) {
-        if (!connectedDevice) {
-          scanForPeripherals()
-        }
-      }
-		}
-
-		askPermission()
-	}, [])
-  
-  return (
-    <View style={styles.container}> 
-      <Text>This is the app view: { meta.name }</Text>
-      <Text>This is the app view: { meta.fullname }</Text>
-      <StatusBar style="auto" /> 
-
-      <Button
-        title="Test dispatch"
-        onPress={() => {
-          meta.test()
-          meta.setName('Biboy Langomez II')
-          console.log(meta.gfns, 'getters here')
-        }}
-      />
-
-      <Button
-        title="Search printer"
-        onPress={() => {
-          meta.showDeviceModal(true) 
-        }}
-      />
-
-      <DeviceModal
-        closeModal={() => meta.showDeviceModal(false)}
-        connectToPeripheral={connectToDevice}
-        devices={allDevices}
-      />
-    </View>
-  )
-}
+import React, { useEffect, useState } from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import PortScanner from 'react-native-find-local-devices';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    height: '100%',
+    maxHeight: '100%',
+    minHeight: '100%',
   },
-})
+  wrapper: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginTop: 10,
+    minHeight: 20,
+  },
+  warning: {
+    textAlign: 'center',
+    color: 'red',
+    fontSize: 20,
+  },
+});
 
-export default memo(Index)
+export default function App() {
+  const [deviceFound, setDeviceFound] = useState([]);
+  const [isFinished, setIsFinished] = useState(false);
+  const [scanner, setScanner] = useState(null);
+  const [checkedDevice, setCheckedDevice] = useState(null);
+
+  const init = () => {
+    setScanner(
+      new PortScanner({
+        timeout: 40,
+        ports: [3000],
+        onDeviceFound: (device) => {
+          console.log('Found device!', device);
+          setDeviceFound((prev) => [...prev, device]);
+        },
+        onFinish: (devices) => {
+          console.log('Finished scanning', devices);
+          setIsFinished(true);
+          setCheckedDevice(null);
+        },
+        onCheck: (device) => {
+          // console.log('Checking IP: ', device.ip, device.port);
+          setCheckedDevice(device);
+        },
+        onNoDevices: () => {
+          console.log('Done without results!');
+          setIsFinished(true);
+          setCheckedDevice(null);
+        },
+        onError: (error) => {
+          // Handle error messages for each socket connection
+          // console.log('Error', error);
+        },
+      })
+    );
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const reset = () => {
+    setCheckedDevice(null);
+    setIsFinished(false);
+    setDeviceFound([]);
+    setScanner(null);
+  };
+
+  const start = () => {
+    console.log('init');
+    reset();
+    scanner?.start();
+  };
+
+  const stop = () => {
+    scanner?.stop();
+    reset();
+    init();
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.warning}>Wi-Fi connection is required!</Text>
+      {!checkedDevice && (
+        <View style={styles.wrapper}>
+          <Button title="Discover devices!" color="steelblue" onPress={start} />
+        </View>
+      )}
+      {checkedDevice && (
+        <View style={styles.wrapper}>
+          <Text>
+            Under checking: {checkedDevice.ip}:{checkedDevice.port}
+          </Text>
+        </View>
+      )}
+      {deviceFound.length > 0 && (
+        <View style={styles.wrapper}>
+          {deviceFound.map((device, i) => (
+            <Text key={i}>
+              New device found: {device?.ip}:{device?.port}
+            </Text>
+          ))}
+        </View>
+      )}
+      {isFinished && (
+        <View style={styles.wrapper}>
+          <Text>Finished scanning!</Text>
+        </View>
+      )}
+      {checkedDevice && (
+        <View style={styles.wrapper}>
+          <Button title="Cancel discovering" color="red" onPress={stop} />
+        </View>
+      )}
+    </View>
+  );
+}
