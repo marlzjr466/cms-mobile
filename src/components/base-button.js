@@ -29,6 +29,7 @@ function BaseButton ({
           <TouchableOpacity
             onPress={action}
             disabled={disabled}
+            style={{opacity: disabled ? 0.7 : 1}}
           >
             <LinearGradient 
               style={STYLES}

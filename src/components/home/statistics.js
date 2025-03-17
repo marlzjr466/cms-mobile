@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react'
+import { memo, useCallback } from 'react'
 
 // components
 import { useComponent } from '@components'
@@ -9,9 +9,14 @@ import { formatWithCurrency } from '@utilities/helper'
 // composable
 import { statisticsList } from '@composable/statistics'
 
-function Statistics () {
+function Statistics ({ patientCount, txnCount, sales }) {
   const { BaseText, BaseDiv, BaseGradient, BaseIcon } = useComponent()
 
+  const getValue = useCallback(type => {
+    return {
+      patientCount, txnCount, sales
+    }[type]
+  }, [patientCount, txnCount, sales])
   return (
     <BaseDiv styles="w-full flex flex-col gap-[5]">
       <BaseText bold={true} styles="pv-[5] color-[#3c4447]">
@@ -30,7 +35,7 @@ function Statistics () {
             </BaseText>
 
             <BaseText bold={true} styles="color-[white] fs-[25] mt-[5]">
-              {item.label === 'Sales' ? formatWithCurrency(item.value) : item.value}
+              {item.label === 'Sales' ? formatWithCurrency(getValue(item.key)) : getValue(item.key)}
             </BaseText>
 
             <BaseIcon

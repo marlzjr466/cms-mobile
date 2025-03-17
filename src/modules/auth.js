@@ -7,13 +7,20 @@ export default () => ({
 
   // states
   metaStates: {
-    auth: null
+    auth: null,
+    username: null
   },
 
   // mutations
   metaMutations: {
     SET_AUTH: (state, { payload }) => {
       state.auth = payload
+    },
+
+    SET_USERNAME: (state, { payload }) => {
+      if (payload) {
+        state.username = payload
+      }
     }
   },
 

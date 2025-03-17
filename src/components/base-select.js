@@ -5,86 +5,53 @@ import BaseButton from './base-button'
 import BaseIcon from './base-icon'
 import BaseText from './base-text'
 
-function BaseSelect({ data, label, width, height, onChange, selected: selectedItem }) {
-  const [selected, setSelected] = useState(label)
-  const [selectState, setSelectState] = useState(false)
+function BaseSelect({ options, placeholder, onChange, defaultOption }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedOption, setSelectedOption] = useState(defaultOption || null)
 
-  useEffect(() => {
-    if (!selectedItem) {
-      setSelected(label)
-      setSelectState(false)
-    }
-  }, [selectedItem])
-
-  return(
-    <>
-      <BaseDiv
-        styles={`
-          w-[${width || 200}]
-          h-[${height || 35}]
-          bw-[1]
-          bc-[rgba(0,0,0,.3)]
-          ph-[10]
-          br-[10]
-          relative
-          mt-[30]
-          zIndex-[1]
-        `}>
-        <BaseButton
-          styles='h-[100%] flex justify-center'
-          action={() => {
-            const state = selectState ? false : true
-            setSelectState(state)
-          }}
-        >
-          <BaseText>{selected}</BaseText>
-        </BaseButton>
+  return (
+    <BaseDiv styles="w-full h-[40] bc-[rgba(0,0,0,.3)] bw-[1] br-[7] ph-[15] relative">
+      <BaseButton
+        styles="w-full h-full flex flex-row items-center justify-between"
+        action={() => setIsOpen(!isOpen)}
+      >
+        <BaseText styles={`fs-[13] ${selectedOption ? '' : 'color-[rgba(0,0,0,.4)]'}`}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </BaseText>
 
         <BaseIcon
-          styles='absolute top-[12] right-[10]'
-          type="fontawesome"
-          name={ selectState ? "angle-up" : "angle-down" }
+          styles="opacity-[.5]"
+          type="fontawesome5"
+          name={isOpen ? "angle-up" : "angle-down"}
+          color="#000"
           size={18}
         />
+      </BaseButton>
 
-        {
-          selectState ?
-            <BaseDiv
-              styles={`
-                w-[${width ? width - 10 : 190}]
-                bg-[#fff]
-                p-[10]
-                flex
-                col
-                absolute
-                top-[${height ? height + 2 : 37}]
-                left-[5]
-                bw-[1]
-                bc-[rgba(0,0,0,.1)]
-                zIndex-[10]
-              `}
-            >
-              {
-                data.map((item, key) => {
-                  return(
-                    <BaseButton
-                      key={key}
-                      styles='w-[100%] p-[10]'
-                      action={() => {
-                        setSelected(item.value)
-                        setSelectState(false)
-                        onChange(item)
-                      }}
-                    >
-                      <BaseText styles={`color-[${item.value == selected ? '#F49531' : 'rgba(0,0,0,.4)'}]`}>{item.value}</BaseText>
-                    </BaseButton>
-                  )
-                })
-              }
-            </BaseDiv> : ''
-        }
-      </BaseDiv>
-    </>
+      {
+        isOpen && (
+          <BaseDiv styles="w-[115%] bg-[white] br-[7] absolute left top-[45] flex flex-col overflow-hidden zIndex-[100] bw-[1] bc-[rgba(0,0,0,.1)]">
+            {
+              options.map((option, i) => (
+                <BaseButton
+                  key={i}
+                  styles="w-full pv-[10] ph-[15]"
+                  action={() => {
+                    onChange(option)
+                    setSelectedOption(option)
+                    setIsOpen(false)
+                  }}
+                >
+                  <BaseText styles="fs-[13]">
+                    {option.label}
+                  </BaseText>
+                </BaseButton>
+              ))
+            }
+          </BaseDiv>
+        )
+      }
+    </BaseDiv>
   )
 }
 

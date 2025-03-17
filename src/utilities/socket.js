@@ -29,6 +29,10 @@ class Socket {
     this.socket.on(eventName, fn)
   }
 
+  off (eventName, fn) {
+    this.socket.off(eventName, fn)
+  }
+
   emit (eventName, data) {
     this.socket.emit(eventName, data)
   }

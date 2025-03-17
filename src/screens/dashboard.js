@@ -16,17 +16,20 @@ const {
   BaseButton,
   BaseImage,
   BaseDiv,
-  BaseGradient
+  BaseGradient,
+  BaseModal
 } = useComponent()
 
 // hooks
-import { useBLE, useScreenSize } from '@hooks'
+import { useBLE, useScreenSize, useAuth, useMeta } from '@hooks'
 
 // images
 import { images } from '@assets/images'
 
 function Dashboard ({ goto, childStacks }) {
-  const { width, height } = useScreenSize()
+  const { metaStates, metaActions } = useMeta()
+  const { auth } = useAuth()
+  const { height } = useScreenSize()
   const {
     requestPermissions,
     scanForPeripherals,
@@ -36,8 +39,25 @@ function Dashboard ({ goto, childStacks }) {
     disconnectFromDevice
   } = useBLE()
 
-  const [activeScreen, setActiveScreen] = useState('home')
+  const attendant = {
+    ...metaStates('attendants', ['profile']),
+    ...metaActions('attendants', ['getProfile', 'patch'])
+  }
 
+  const [activeScreen, setActiveScreen] = useState('home')
+  const [showModal, setShowModal] = useState(false)
+
+  console.log(auth)
+
+  useEffect(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE)
+    askPermission()
+    loadProfile()
+  }, [])
+
+  const loadProfile = async () => {
+    await attendant.getProfile(auth?.attendant_id)
+  }
 
   // ask bluetooth permission
   const askPermission = async () => {
@@ -49,11 +69,6 @@ function Dashboard ({ goto, childStacks }) {
       }
     }
   }
-
-  useEffect(() => {
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE)
-    askPermission()
-  }, [])
 
   return (
     <>
@@ -97,7 +112,7 @@ function Dashboard ({ goto, childStacks }) {
                 bold={true}
                 styles="color-[#3c4447] fs-[13] flex gap-[2]"
               >
-                Athena Xiantelle Shekinah
+                {attendant.profile?.first_name} {attendant.profile?.last_name}
               </BaseText>
 
               <BaseText styles="color-[#3c4447] fs-[11] flex gap-[2] opacity-[.7]">

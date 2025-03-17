@@ -45,10 +45,10 @@ export default function BaseDiv ({
             ? () => { scrollViewRef.current.scrollToEnd({ animated: true }) }
             : () => {}
       }
-        style={{
-          width: '100%',
-          height: '100%'
-        }}
+        // style={{
+        //   width: '100%',
+        //   height: '100%'
+        // }}
       >
         <View style = { STYLES }>
           { children }

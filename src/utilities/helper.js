@@ -1,6 +1,7 @@
 import { jwtDecode } from 'jwt-decode'
 import ThermalPrinterModule from 'react-native-thermal-printer'
 import moment from 'moment'
+import _ from 'lodash'
 
 async function printQueueNumber (activeQueueNumber, name) {
   try {
@@ -55,6 +56,23 @@ function formatWithCurrency(value, currency = 'PHP') {
   return formatter.format(numericValue);
 }
 
+function getAge (birthDate) {
+  const today = new Date()
+  const birth = new Date(birthDate)
+
+  let age = _.subtract(today.getFullYear(), birth.getFullYear())
+
+  // Check if birthday has occurred this year
+  if (
+    _.gt(birth.getMonth(), today.getMonth()) ||
+    (_.eq(birth.getMonth(), today.getMonth()) && _.gte(birth.getDate(), today.getDate()))
+  ) {
+    --age
+  }
+
+  return age
+}
+
 const storage = {
   set (key, value) {
     global.$localStorage.setItem(key, value)
@@ -75,5 +93,6 @@ export {
   formatQueueNumber,
   getDate,
   storage,
-  formatWithCurrency
+  formatWithCurrency,
+  getAge
 }

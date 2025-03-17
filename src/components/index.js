@@ -9,6 +9,7 @@ import BaseInput from "@components/base-input"
 import BaseList from "@components/base-list"
 import BaseAnimatable from "@components/base-animatable"
 import BaseSelect from "@components/base-select"
+import BaseDatePicker from "@components/base-date-picker"
 
 export const useComponent = () => ({
   BaseText,
@@ -21,5 +22,6 @@ export const useComponent = () => ({
   BaseInput,
   BaseList,
   BaseAnimatable,
-  BaseSelect
+  BaseSelect,
+  BaseDatePicker
 })

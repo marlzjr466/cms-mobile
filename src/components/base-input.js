@@ -13,7 +13,8 @@ export default function BaseInput({
   type,
   value,
   editable,
-  action
+  action,
+  defaultValue
 }) {
   let STYLES = {}
 
@@ -56,6 +57,7 @@ export default function BaseInput({
       onChangeText = { action }
       editable = { editable || true }
       selectTextOnFocus= { editable || true }
+      defaultValue={defaultValue || null}
     />
   )
 }

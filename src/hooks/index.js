@@ -6,6 +6,8 @@ import { useAuth } from "./useAuth"
 import { useScreenSize } from "./useScreenSize"
 import { useNetworkInfo } from "./usetNetworkInfo"
 import { useAddressReachable } from "./useAddressReacheble"
+import { useModal } from "./useModal"
+import { useClickOutside } from "./useClickOutside"
 
 export {
   useBLE,
@@ -15,5 +17,7 @@ export {
   useAuth,
   useScreenSize,
   useNetworkInfo,
-  useAddressReachable
+  useAddressReachable,
+  useModal,
+  useClickOutside
 }

@@ -156,10 +156,7 @@ function SetupHost () {
         </BaseText>
       </BaseButton>
 
-      <BaseModal
-        visible={showModal}
-        styles="w-full h-full bg-[rgba(0,0,0,.5)] absolute ph-[80] flex items-center justify-center"
-      >
+      <BaseModal visible={showModal}>
         <BaseDiv styles="w-[400] p-[20] bg-[white] br-[15] flex flex-col items-center justify-center gap-[10]">
           {
             noServerFound ? (

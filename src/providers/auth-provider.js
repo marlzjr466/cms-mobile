@@ -43,7 +43,10 @@ function AuthProvider ({ children }) {
       setAuth(decodeToken(res.token))
       storage.set('token', res.token)
       toast.show('Login successful!')
-      callback()
+
+      if (callback) {
+        callback()
+      }
     } catch (error) {
       console.log('error:', error.message)
       toast.show(error.message)
@@ -59,7 +62,10 @@ function AuthProvider ({ children }) {
       if (res === 'OK') {
         await storage.remove('token')
         setAuth(null)
-        callback()
+
+        if (callback) {
+          callback()
+        }
       }
     } catch (error) {
       console.log('error:', error.message)

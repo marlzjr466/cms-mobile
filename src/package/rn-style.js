@@ -60,6 +60,7 @@ function getProperty (property) {
     'items-center': ['alignItems', 'center'],
     'w-full': ['width', '100%'],
     'h-full': ['height', '100%'],
+    'flex-shrink': ['flexShrink', 1],
 
     // margin
     m: 'margin',
@@ -107,6 +108,10 @@ function getProperty (property) {
 
     w: 'width',
     h: 'height',
+    maxW: 'maxWidth',
+    minW: 'minWidth',
+    maxH: 'maxHeight',
+    minH: 'minHeight',
     bg: 'backgroundColor',
     opacity: 'opacity',
     color: 'color',

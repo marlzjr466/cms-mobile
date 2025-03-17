@@ -8,7 +8,9 @@ import {
   Fontisto,
   AntDesign,
   SimpleLineIcons,
-  MaterialCommunityIcons
+  MaterialCommunityIcons,
+  FontAwesome5,
+  FontAwesome6
 } from '@expo/vector-icons'
   
 function BaseIcon ({ type, name, size, color, styles, customStyles }) {
@@ -109,6 +111,24 @@ function BaseIcon ({ type, name, size, color, styles, customStyles }) {
 
     case 'materialcommunityicons':
       icon = <MaterialCommunityIcons 
+          style={STYLES}
+          name={name ? name : null} 
+          size={size ? size : 25} 
+          color={color ? color : '#000'} 
+      />
+      break
+
+    case 'fontawesome5':
+      icon = <FontAwesome5 
+          style={STYLES}
+          name={name ? name : null} 
+          size={size ? size : 25} 
+          color={color ? color : '#000'} 
+      />
+      break
+
+    case 'fontawesome6':
+      icon = <FontAwesome6 
           style={STYLES}
           name={name ? name : null} 
           size={size ? size : 25} 
