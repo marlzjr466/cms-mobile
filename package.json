@@ -19,7 +19,7 @@
     "@types/react": "~18.2.45",
     "axios": "^1.6.7",
     "base-64": "^1.0.0",
-    "eas-cli": "^7.3.0",
+    "eas-cli": "^15.0.15",
     "expo": "~50.0.7",
     "expo-constants": "^15.4.6",
     "expo-dev-client": "^3.3.10",
