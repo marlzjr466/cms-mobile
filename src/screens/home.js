@@ -46,8 +46,8 @@ function Home () {
   }
 
   const transactions = {
-    ...metaStates('transactions', ['count', 'list']),
-    ...metaActions('transactions', ['fetch', 'patch'])
+    ...metaStates('transactions', ['pendingCount', 'pendingList']),
+    ...metaActions('transactions', ['fetchPending', 'patch'])
   }
 
   const statistics = {
@@ -132,57 +132,7 @@ function Home () {
 
   const loadTransactions = async () => {
     try {
-      await transactions.fetch({
-        filters: [
-          {
-            field: 'deleted_at',
-            value: 'null'
-          },
-          {
-            field: 'status',
-            value: 'pending'
-          }
-        ],
-        columns: ['id', 'record_id', 'status'],
-        aggregate: [
-          {
-            table: 'records',
-            filters: [
-              {
-                field: 'id',
-                key: 'record_id'
-              }
-            ],
-            is_first: true,
-            columns: ['medication', 'patient_id', 'doctor_id'],
-            aggregate: [
-              {
-                table: 'patients',
-                filters: [
-                  {
-                    field: 'id',
-                    key: 'patient_id'
-                  }
-                ],
-                is_first: true,
-                columns: ['first_name', 'last_name', 'gender', 'birth_date'],
-              },
-              {
-                table: 'doctors',
-                filters: [
-                  {
-                    field: 'id',
-                    key: 'doctor_id'
-                  }
-                ],
-                is_first: true,
-                columns: ['first_name', 'last_name'],
-              }
-            ]
-          }
-        ],
-        is_count: true
-      })
+      await transactions.fetchPending()
     } catch (error) {
       showToast(error.message)
     }
@@ -316,7 +266,7 @@ function Home () {
               />
             </BaseDiv>
             
-            <Transactions data={transactions?.list} dataCount={transactions?.count} onView={txn => showTransactionModal(txn)}/>
+            <Transactions data={transactions?.pendingList} dataCount={transactions?.pendingCount} onView={txn => showTransactionModal(txn)}/>
             <InQueue data={queues?.list} dataCount={queues?.count}/>
           </BaseDiv>
         </BaseDiv>
