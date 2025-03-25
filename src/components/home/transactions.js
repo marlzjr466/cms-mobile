@@ -59,29 +59,36 @@ function Transactions ({ data, dataCount, onView }) {
       </BaseDiv>
 
       <BaseDiv styles="w-full flex flex-row gap-[5] items-center p-[10]">
-        <BaseText styles="w-[70] fs-[12] color-[#000] opacity-[.4]">
+        <BaseText styles="w-[80] fs-[12] color-[#000] opacity-[.4]">
           TXN ID
         </BaseText>
 
-        <BaseText styles="w-[150] fs-[12] color-[#000] opacity-[.4]">
+        <BaseText styles="flex-1 fs-[12] color-[#000] opacity-[.4]">
           Patient
         </BaseText>
 
-        <BaseText styles="w-[50] ml-[auto] fs-[12] color-[#000] opacity-[.4]">
+        {/* <BaseText styles="w-[50] ml-[auto] fs-[12] color-[#000] opacity-[.4]">
           Action
-        </BaseText>
+        </BaseText> */}
       </BaseDiv>
 
       <BaseDiv scrollable styles="flex-1 flex flex-col gap-[5]">
         {
           dataCount ? (
             data.map((item, i) => (
-              <BaseDiv key={i} styles="w-full flex flex-row gap-[5] items-center bg-[#fff] h-[45] ph-[10] br-[10] bw-[1] bc-[#f1f1f1]">
-                <BaseText bold={true} styles="w-[70] color-[#3c4447] fs-[12]">
+              <BaseButton 
+                key={i} 
+                styles="w-full flex flex-row gap-[5] items-center bg-[#fff] h-[45] ph-[10] br-[10] bw-[1] bc-[#f1f1f1]"
+                action={() => {
+                  setActiveId(item.id)
+                  onView(item)
+                }}
+              >
+                <BaseText bold={true} styles="w-[80] color-[#3c4447] fs-[12]">
                   CMS-{formatQueueNumber(item.id)}
                 </BaseText>
   
-                <BaseDiv styles="w-[170] flex flex-row gap-[10] items-center">
+                <BaseDiv styles="flex-1 flex flex-row gap-[10] items-center">
                   <BaseDiv styles="w-[25] h-[25] br-[15]">
                     <BaseImage
                       styles="w-[25] h-[25]"
@@ -93,19 +100,7 @@ function Transactions ({ data, dataCount, onView }) {
                     {item.records?.patients?.first_name} {item.records?.patients?.last_name}
                   </BaseText>
                 </BaseDiv>
-  
-                <BaseButton
-                  styles="w-[60]"
-                  action={() => {
-                    setActiveId(item.id)
-                    onView(item)
-                  }}
-                >
-                  <BaseText bold={true} styles={`w-[50] text-center ml-[auto] fs-[10] color-[#009ad8] bg-[#eaf9ff] ph-[10] pv-[5] br-[20]`}>
-                    View
-                  </BaseText> 
-                </BaseButton>
-              </BaseDiv>
+              </BaseButton>
             ))
           ) : <Nodata label="No data in transactions" />
         }
@@ -113,5 +108,17 @@ function Transactions ({ data, dataCount, onView }) {
     </BaseDiv>
   )
 }
+
+{/* <BaseButton
+  styles="w-[60]"
+  action={() => {
+    setActiveId(item.id)
+    onView(item)
+  }}
+>
+  <BaseText bold={true} styles={`w-[50] text-center ml-[auto] fs-[10] color-[#009ad8] bg-[#eaf9ff] ph-[10] pv-[5] br-[20]`}>
+    View
+  </BaseText> 
+</BaseButton> */}
 
 export default memo(Transactions)

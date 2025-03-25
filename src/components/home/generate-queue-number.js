@@ -85,8 +85,7 @@ function GenerateQueueNumber ({ number, onGenerate }) {
 
       // process print queue number here
       // with thermal printer
-      const queueNumber = formatQueueNumber(next)
-      await printQueueNumber(queueNumber)
+      await printQueueNumber(formatQueueNumber(current))
 
       hide()
       onGenerate(next)
