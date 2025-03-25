@@ -50,54 +50,6 @@ function Patients () {
     }
   }, [updatedData])
 
-  // const loadPatients = async (data = null) => {
-  //   const filters = [
-  //     {
-  //       field: 'deleted_at',
-  //       value: 'null'
-  //     }
-  //   ]
-
-  //   if (data) {
-  //     filters.push(...[
-  //       {
-  //         field: 'first_name',
-  //         operator: 'like',
-  //         value: data
-  //       },
-  //       {
-  //         field: 'last_name',
-  //         operator: 'orlike',
-  //         value: data
-  //       }
-  //     ])
-  //   }
-
-  //   await patients.fetch({
-  //     filters,
-  //     aggregate: [
-  //       {
-  //         table: 'records',
-  //         filters: [
-  //           {
-  //             field: 'patient_id',
-  //             key: 'id'
-  //           }
-  //         ],
-  //         is_first: true,
-  //         columns: ['id', 'created_at'],
-  //         sort
-  //       }
-  //     ],
-  //     is_count: true,
-  //     pagination,
-  //     sort: [
-  //       ...sort,
-  //       { field: 'id', direction: 'desc' }
-  //     ]
-  //   })
-  // }
-
   const loadPatients = async (data = null) => {
     const filters = [
       {
