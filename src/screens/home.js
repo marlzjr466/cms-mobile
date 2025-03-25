@@ -264,9 +264,9 @@ function Home () {
                     return conFirmAlert()
                   }
 
-                  if (!meta.deviceName) {
-                    return showToast('Please connect to a thermal printer before starting the queue.', 'LONG')
-                  }
+                  // if (!meta.deviceName) {
+                  //   return showToast('Please connect to a thermal printer before starting the queue.', 'LONG')
+                  // }
 
                   setStartQueue(true)
                 }}

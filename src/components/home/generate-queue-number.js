@@ -86,14 +86,12 @@ function GenerateQueueNumber ({ number, onGenerate }) {
       // process print queue number here
       // with thermal printer
       const queueNumber = formatQueueNumber(next)
-      const res = await printQueueNumber(queueNumber)
+      await printQueueNumber(queueNumber)
 
-      if (res) {
-        hide()
-        onGenerate(next)
-        setSelectedPatient(null)
-        showToast(`Queue number ${formatQueueNumber(current)} generated`)
-      }
+      hide()
+      onGenerate(next)
+      setSelectedPatient(null)
+      showToast(`Queue number ${formatQueueNumber(current)} generated`)
     } catch (error) {
       showToast(error.message)
     }

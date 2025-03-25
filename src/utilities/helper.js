@@ -24,6 +24,7 @@ async function printQueueNumber (activeQueueNumber) {
      })
   } catch (error) {
     console.log('printQueueNumber Error:', error)
+    return null
   }
 }
 
