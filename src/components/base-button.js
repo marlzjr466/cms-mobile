@@ -13,7 +13,7 @@ function BaseButton ({
   let STYLES = {}
 
   if (styles) {
-    STYLES = global.$rnStyle(styles)
+    STYLES = global.$rnStyle(disabled ? `${styles} opacity-[.5]` : styles)
     if (customStyles) {
       STYLES = {
         ...STYLES,

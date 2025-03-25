@@ -43,18 +43,18 @@ const Table = ({ headers, data, totalDataCount, currentPage, onPageChange, onSea
 
     const value = extractValue(item, header.key)
     if (header.format) {
-      return moment(value).format(header.format)
+      return value ? moment(value).format(header.format) : '---'
     }
 
     if (header.capitalize) {
-      return _.capitalize(value)
+      return value ? _.capitalize(value) : '---'
     }
 
     if (header.currency) {
-      return formatWithCurrency(value)
+      return value ? formatWithCurrency(value) : '---'
     }
 
-    return value
+    return value || '---'
   }
 
   return (

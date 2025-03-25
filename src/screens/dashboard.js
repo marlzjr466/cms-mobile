@@ -21,7 +21,7 @@ const {
 } = useComponent()
 
 // hooks
-import { useBLE, useScreenSize, useAuth, useMeta } from '@hooks'
+import { useScreenSize, useAuth, useMeta } from '@hooks'
 
 // images
 import { images } from '@assets/images'
@@ -30,14 +30,6 @@ function Dashboard ({ goto, childStacks }) {
   const { metaStates, metaActions } = useMeta()
   const { auth } = useAuth()
   const { height } = useScreenSize()
-  const {
-    requestPermissions,
-    scanForPeripherals,
-    allDevices,
-    connectToDevice,
-    connectedDevice,
-    disconnectFromDevice
-  } = useBLE()
 
   const attendant = {
     ...metaStates('attendants', ['profile']),
@@ -47,27 +39,13 @@ function Dashboard ({ goto, childStacks }) {
   const [activeScreen, setActiveScreen] = useState('home')
   const [showModal, setShowModal] = useState(false)
 
-  console.log(auth)
-
   useEffect(() => {
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE)
-    askPermission()
     loadProfile()
   }, [])
 
   const loadProfile = async () => {
     await attendant.getProfile(auth?.attendant_id)
-  }
-
-  // ask bluetooth permission
-  const askPermission = async () => {
-    const permission = await requestPermissions()
-
-    if (permission) {
-      if (!connectedDevice) {
-        scanForPeripherals()
-      }
-    }
   }
 
   return (

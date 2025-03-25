@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 
 // components
 import { useComponent } from '@components'
@@ -10,8 +10,39 @@ import { images } from '@assets/images'
 // utils
 import { formatQueueNumber } from '@utilities/helper'
 
+// hooks
+import { useMeta, useToast } from '@hooks'
+
 function Transactions ({ data, dataCount, onView }) {
   const { BaseText, BaseDiv, BaseButton, BaseImage } = useComponent()
+  const { show } = useToast()
+  const { metaActions } = useMeta()
+
+  const [activeId, setActiveId] = useState(null)
+
+  useEffect(() => {
+    if (activeId) {
+      handleView()
+    }
+  }, [activeId])
+
+  const txn = {
+    ...metaActions('transactions', ['patch'])
+  }
+
+  const handleView = async () => {
+    try {
+      await txn.patch({
+        key: 'id',
+        data: {
+          id: activeId,
+          status: 'ongoing'
+        }
+      })
+    } catch (error) {
+      show(error.message)
+    }
+  }
   
   return (
     <BaseDiv styles="flex-1 flex flex-col">
@@ -63,7 +94,13 @@ function Transactions ({ data, dataCount, onView }) {
                   </BaseText>
                 </BaseDiv>
   
-                <BaseButton styles="w-[60]" action={() => onView(item)}>
+                <BaseButton
+                  styles="w-[60]"
+                  action={() => {
+                    setActiveId(item.id)
+                    onView(item)
+                  }}
+                >
                   <BaseText bold={true} styles={`w-[50] text-center ml-[auto] fs-[10] color-[#009ad8] bg-[#eaf9ff] ph-[10] pv-[5] br-[20]`}>
                     View
                   </BaseText> 

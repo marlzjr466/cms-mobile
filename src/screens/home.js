@@ -13,6 +13,7 @@ import Transactions from '@components/home/transactions'
 import AddPatientModal from '@components/home/add-patient-modal'
 import GenerateQueueNumber from '@components/home/generate-queue-number'
 import TransactionModal from '@components/home/transaction-modal'
+import ProductsModal from '@components/home/products'
 import ConfirmAlert from '@components/home/confirm-alert'
 import Nodata from '@components/Nodata'
 
@@ -25,20 +26,27 @@ const {
 } = useComponent()
 
 // hooks
-import { useAuth, useModal, useStorage, useMeta, useToast } from '@hooks'
+import { useAuth, useModal, useStorage, useMeta, useToast, useDevice } from '@hooks'
 
 // utils
 import { formatQueueNumber } from '@utilities/helper'
 
 function Home () {
   const storage = useStorage()
+  const { connectedDevice } = useDevice()
   const { auth } = useAuth()
   const { show, hide } = useModal()
   const { show: showToast } = useToast()
-  const { metaStates, metaActions } = useMeta()
+  const { metaStates, metaActions, metaMutations } = useMeta()
 
   const [startQueue, setStartQueue] = useState(false)
   const [currentQueueNumber, setCurrentQueueNumber] = useState(1)
+  const [currentViewTxn, setCurrentViewTxn] = useState(null)
+  const [onTxnCancelId, setOnTxnCancelId] = useState(null)
+
+  const meta = {
+    ...metaStates('home', ['deviceName'])
+  }
 
   const queues = {
     ...metaStates('queues', ['count', 'list']),
@@ -53,6 +61,11 @@ function Home () {
   const statistics = {
     ...metaStates('statistics', ['patientCount', 'txnCount', 'sales']),
     ...metaActions('statistics', ['fetch'])
+  }
+
+  const products = {
+    ...metaMutations('products', ['SET_ITEMS', 'SET_ITEMS_CLEAR']),
+    ...metaActions('products', ['setItems', 'fetch', 'fetchCategories', 'fetchProductItems', 'fetchProductVariants'])
   }
 
   useEffect(() => {
@@ -70,6 +83,7 @@ function Home () {
     loadInQueue()
     loadTransactions()
     loadStatistics()
+    loadCategories()
 
     socket.on('refresh', types => {
       if (types.includes('queues')) {
@@ -89,12 +103,30 @@ function Home () {
   }, [])
 
   useEffect(() => {
+    if (currentViewTxn) {
+      showTransactionModal()
+    }
+  }, [currentViewTxn])
+
+  useEffect(() => {
     storage.set('current-number', String(currentQueueNumber))
   }, [currentQueueNumber])
 
   useEffect(() => {
     storage.set('queue-started', String(startQueue))
   }, [startQueue])
+
+  const loadCategories = async () => {
+    await products.fetchCategories({
+      filters: [
+        {
+          field: 'deleted_at',
+          value: 'null'
+        }
+      ],
+      is_count: true
+    })
+  }
 
   const loadInQueue = async () => {
     try {
@@ -148,8 +180,45 @@ function Home () {
     }
   }
 
+  const handleCancelTxn = async isCompleted => {
+    try {
+      if (!isCompleted) {
+        await transactions.patch({
+          key: 'id',
+          data: {
+            id: onTxnCancelId,
+            status: 'pending'
+          }
+        })
+      }
+
+      setOnTxnCancelId(null)
+      products.SET_ITEMS_CLEAR()
+    } catch (error) {
+      show(error.message)
+    }
+  }
+
   const showPatientModal = () => show(<AddPatientModal/>)
-  const showTransactionModal = txn => show(<TransactionModal data={txn} />)
+  const showTransactionModal = () => show(
+    <TransactionModal
+      data={currentViewTxn}
+      onAddProduct={showProductsModal}
+      onCancel={async isCompleted => {
+        handleCancelTxn(isCompleted)
+        setCurrentViewTxn(null)
+        hide()
+      }}
+    />
+  )
+  const showProductsModal = () => show(
+    <ProductsModal
+      onHide={showTransactionModal}
+      onSelectedItem={item => {
+        products.SET_ITEMS(item)
+      }}
+    />
+  )
   const showGenerateQueueModal = () => show(
     <GenerateQueueNumber
       number={formatQueueNumber(currentQueueNumber)}
@@ -193,6 +262,10 @@ function Home () {
                 action={() => {
                   if (startQueue) {
                     return conFirmAlert()
+                  }
+
+                  if (!meta.deviceName) {
+                    return showToast('Please connect to a thermal printer before starting the queue.', 'LONG')
                   }
 
                   setStartQueue(true)
@@ -266,7 +339,14 @@ function Home () {
               />
             </BaseDiv>
             
-            <Transactions data={transactions?.pendingList} dataCount={transactions?.pendingCount} onView={txn => showTransactionModal(txn)}/>
+            <Transactions
+              data={transactions?.pendingList}
+              dataCount={transactions?.pendingCount}
+              onView={txn => {
+                setCurrentViewTxn(txn)
+                setOnTxnCancelId(txn.id)
+              }}
+            />
             <InQueue data={queues?.list} dataCount={queues?.count}/>
           </BaseDiv>
         </BaseDiv>

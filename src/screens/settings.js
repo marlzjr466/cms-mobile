@@ -4,6 +4,7 @@ import PortScanner from 'react-native-find-local-devices'
 
 // components
 import { useComponent } from '@components'
+import DeviceModal from '@modals/device-connection'
 const {
   BaseText,
   BaseInput,
@@ -15,18 +16,23 @@ const {
   BaseModal
 } = useComponent()
 
+import { useGlobalModals } from '@modals'
+
 // hooks
-import { useStorage, useMeta, useAddressReachable, useAuth, useToast } from '@hooks'
+import { useStorage, useMeta, useAddressReachable, useAuth, useToast, useDevice, useModal } from '@hooks'
 
 // images
 import { images } from '@assets/images'
 
 function Settings () {
+  const { DeviceConnection, connectedDevice } = useGlobalModals()
   const storage = useStorage()
   const { metaMutations, metaStates, metaActions } = useMeta()
   const { isReachable } = useAddressReachable()
   const { auth, logout } = useAuth()
   const { show: showToast } = useToast()
+  const { show, hide } = useModal()
+  const { allDevices, connectToDevice } = useDevice()
 
   const [showModal, setShowModal] = useState(false)
   const [localServer, setLocalServer] = useState(null)
@@ -37,6 +43,10 @@ function Settings () {
   const [firstname, setFirstname] = useState('')
   const [lastname, setLastname] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
+
+  const meta = {
+    ...metaStates('home', ['deviceName'])
+  }
 
   const host = {
     ...metaMutations('host', ['SET_ADDRESS'])
@@ -149,65 +159,116 @@ function Settings () {
     scanner?.stop()
   }
 
+  const showDeviceConnectionModal = () => {
+    show(
+      <DeviceConnection
+        connectToPeripheral={async device => {
+          await connectToDevice(device)
+          showToast(`Success! Connected to ${device.name}`)
+          hide()
+        }}
+        devices={allDevices}
+        onHide={hide}
+      />  
+    )
+  }
+
   return (
     <BaseDiv styles="flex-1 bg-[#f9f9f9] p-[20] flex flex-col gap-[5] relative">
       {/* Host server */}
-      <BaseDiv styles="w-full bg-[white] br-[10] bw-[1] bc-[rgba(0,0,0,.1)] p-[10]">
-        <BaseText styles="color-[rgba(0,0,0,.3)] fs-[12]">
-          API Server
-        </BaseText>
+      <BaseDiv styles="w-full flex flex-row gap-[5]">
+        <BaseDiv styles="flex-1 bg-[white] br-[10] bw-[1] bc-[rgba(0,0,0,.1)] p-[10]">
+          <BaseText styles="color-[rgba(0,0,0,.3)] fs-[12]">
+            API Server
+          </BaseText>
 
-        <BaseText styles="color-[rgba(0,0,0,.6)] fs-[13] mt-[15] pl-[3]">
-          Host Address
-        </BaseText>
+          <BaseText styles="color-[rgba(0,0,0,.6)] fs-[13] mt-[15] pl-[3]">
+            Host Address
+          </BaseText>
 
-        <BaseInput
-          defaultValue={hostAddress}
-          styles="w-full h-[45] br-[10] bg-[white] ph-[15] bw-[1] bc-[rgba(0,0,0,.1)] fs-[13] mt-[5]"
-          placeholder="Enter host manually (e.g., http://192.168.1.100:3000)"
-          action={value => setHostAddress(value)}
-        />
+          <BaseInput
+            defaultValue={hostAddress}
+            styles="w-full h-[45] br-[10] bg-[white] ph-[15] bw-[1] bc-[rgba(0,0,0,.1)] fs-[13] mt-[5]"
+            placeholder="Enter host manually (e.g., http://192.168.1.100:3000)"
+            action={value => setHostAddress(value)}
+          />
 
-        <BaseDiv styles="flex flex-row items-center gap-[5]">
-          <BaseButton
-            styles="p-[10] w-[160] flex flex-row items-center justify-center gap-[5] br-[7] mt-[15]"
-            gradient={true}
-            gradientColors={['#ffbf6a', '#ff651a']}
-            action={async () => {
-              await logout()
-              host.SET_ADDRESS(hostAddress)
-            }}
-          >
-            <BaseIcon
-              type="materialcommunityicons"
-              name="connection"
-              color="#fff"
-              size={13}
-            />
-            <BaseText styles="color-[#fff] fs-[13]">
-              Connect Manually
+          <BaseDiv styles="flex flex-row items-center gap-[5]">
+            <BaseButton
+              styles="p-[10] w-[160] flex flex-row items-center justify-center gap-[5] br-[7] mt-[15]"
+              gradient={true}
+              gradientColors={['#ffbf6a', '#ff651a']}
+              action={async () => {
+                await logout()
+                host.SET_ADDRESS(hostAddress)
+              }}
+            >
+              <BaseIcon
+                type="materialcommunityicons"
+                name="connection"
+                color="#fff"
+                size={13}
+              />
+              <BaseText styles="color-[#fff] fs-[13]">
+                Connect Manually
+              </BaseText>
+            </BaseButton>
+
+            <BaseButton
+              styles="p-[10] w-[130] flex flex-row items-center justify-center gap-[5] br-[7] mt-[15]"
+              gradient={true}
+              gradientColors={['#ffbf6a', '#ff651a']}
+              action={() => {
+                scanner?.start()
+                setShowModal(true)
+              }}
+            >
+              <BaseIcon
+                type="materialcommunityicons"
+                name="connection"
+                color="#fff"
+                size={13}
+              />
+              <BaseText styles="color-[#fff] fs-[13]">
+                Scan Server
+              </BaseText>
+            </BaseButton>
+          </BaseDiv>
+        </BaseDiv>
+
+        <BaseDiv styles="flex-1 bg-[white] br-[10] bw-[1] bc-[rgba(0,0,0,.1)] p-[10]">
+          <BaseText styles="color-[rgba(0,0,0,.3)] fs-[12]">
+            Thermal Printer
+          </BaseText>
+
+          <BaseText styles="color-[rgba(0,0,0,.6)] fs-[13] mt-[15] pl-[3]">
+            Name
+          </BaseText>
+
+          <BaseDiv styles="w-full flex justify-center h-[45] br-[10] bg-[white] ph-[15] bw-[1] bc-[rgba(0,0,0,.1)] mt-[5]">
+            <BaseText styles={`fs-[13] ${!meta.deviceName ? 'opacity-[.3]' : ''}`}>
+              {meta.deviceName ? meta.deviceName : '-----'}
             </BaseText>
-          </BaseButton>
+          </BaseDiv>
 
-          <BaseButton
-            styles="p-[10] w-[130] flex flex-row items-center justify-center gap-[5] br-[7] mt-[15]"
-            gradient={true}
-            gradientColors={['#ffbf6a', '#ff651a']}
-            action={() => {
-              scanner?.start()
-              setShowModal(true)
-            }}
-          >
-            <BaseIcon
-              type="materialcommunityicons"
-              name="connection"
-              color="#fff"
-              size={13}
-            />
-            <BaseText styles="color-[#fff] fs-[13]">
-              Scan Server
-            </BaseText>
-          </BaseButton>
+          <BaseDiv styles="flex flex-row items-center gap-[5]">
+            <BaseButton
+              styles="p-[10] w-[130] flex flex-row items-center justify-center gap-[5] br-[7] mt-[15]"
+              gradient={true}
+              gradientColors={['#ffbf6a', '#ff651a']}
+              action={showDeviceConnectionModal}
+            >
+              <BaseIcon
+                type="materialcommunityicons"
+                name="printer"
+                color="#fff"
+                size={13}
+              />
+              <BaseText styles="color-[#fff] fs-[13]">
+                Scan Printer
+              </BaseText>
+            </BaseButton>
+          </BaseDiv>
         </BaseDiv>
       </BaseDiv>
       

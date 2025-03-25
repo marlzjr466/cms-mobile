@@ -20,7 +20,7 @@ import { useModal, useToast, useMeta, useAuth, useStorage } from '@hooks'
 import { images } from '@assets/images'
 
 // utils
-import { getAge, formatQueueNumber } from '@utilities/helper'
+import { getAge, formatQueueNumber, printQueueNumber } from '@utilities/helper'
 
 function GenerateQueueNumber ({ number, onGenerate }) {
   const { auth } = useAuth()
@@ -33,8 +33,8 @@ function GenerateQueueNumber ({ number, onGenerate }) {
   const [selectedPatient, setSelectedPatient] = useState(null)
 
   const patients = {
-    ...metaStates('patients', ['list', 'count']),
-    ...metaActions('patients', ['fetch'])
+    ...metaStates('patients', ['searchList', 'searchCount']),
+    ...metaActions('patients', ['fetchSearchList'])
   }
 
   const queues = {
@@ -43,7 +43,7 @@ function GenerateQueueNumber ({ number, onGenerate }) {
 
   const handlePatientSearch = async () => {
     try {
-      await patients.fetch({
+      await patients.fetchSearchList({
         filters: [
           {
             field: 'admin_id',
@@ -85,11 +85,15 @@ function GenerateQueueNumber ({ number, onGenerate }) {
 
       // process print queue number here
       // with thermal printer
+      const queueNumber = formatQueueNumber(next)
+      const res = await printQueueNumber(queueNumber)
 
-      hide()
-      onGenerate(next)
-      setSelectedPatient(null)
-      showToast(`Queue number ${formatQueueNumber(current)} generated`)
+      if (res) {
+        hide()
+        onGenerate(next)
+        setSelectedPatient(null)
+        showToast(`Queue number ${formatQueueNumber(current)} generated`)
+      }
     } catch (error) {
       showToast(error.message)
     }
@@ -126,8 +130,8 @@ function GenerateQueueNumber ({ number, onGenerate }) {
         <BaseDiv styles="w-full maxH-[300]">
           <BaseDiv scrollable styles="w-full flex-1 flex flex-col gap-[5]">
             {
-              patients.count ? (
-                patients?.list.map((patient, i) => (
+              patients.searchCount ? (
+                patients?.searchList.map((patient, i) => (
                   <BaseButton
                     key={i}
                     styles={`w-full flex flex-row gap-[5] items-center bg-[#fff] h-[55] ph-[10] br-[10] ${selectedPatient?.id === patient.id ? 'bw-[2] bc-[#27df9a]' : 'bw-[1] bc-[#f1f1f1]'}`}
@@ -145,10 +149,14 @@ function GenerateQueueNumber ({ number, onGenerate }) {
                         <BaseText bold={true} ellipsis={1} styles="color-[#3c4447] fs-[12]">
                           {patient.first_name} {patient.last_name}
                         </BaseText>
-  
-                        <BaseText styles="fs-[10] color-[#000] opacity-[.5]">
-                          {_.capitalize(patient.gender)} | {getAge(patient.birth_date)}
-                        </BaseText>
+
+                        {
+                          (patient.gender || patient.birth_date) && (
+                            <BaseText styles="fs-[10] color-[#000] opacity-[.5]">
+                              {patient.gender ? _.capitalize(patient.gender) : '---'} | {patient.birth_date ? getAge(patient.birth_date) : '---'}
+                            </BaseText>
+                          )
+                        }
                       </BaseDiv>
   
                       {

@@ -3,7 +3,7 @@ import ThermalPrinterModule from 'react-native-thermal-printer'
 import moment from 'moment'
 import _ from 'lodash'
 
-async function printQueueNumber (activeQueueNumber, name) {
+async function printQueueNumber (activeQueueNumber) {
   try {
     let payload =
       "[C]   Hello there, you are currently in the queue\n" +
@@ -12,7 +12,6 @@ async function printQueueNumber (activeQueueNumber, name) {
       "[L]\n\n" +
       "[C][C]        <font size='big'><b>"+ activeQueueNumber +"</b></font>" +
       "[L]\n\n\n" +
-      "[L]   Serve by: "+ name +"\n" +
       "[L]   "+moment().format('MMMM Do YYYY, h:mm:ss a')+"\n" +
       "[L]\n\n" +
       "[L]\n\n" +

@@ -1,6 +1,6 @@
 import * as Animatable from 'react-native-animatable'
 import { View, ScrollView } from 'react-native'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 export default function BaseDiv ({
   children,
@@ -11,12 +11,27 @@ export default function BaseDiv ({
   scrollToBottom,
   animatable,
   animation,
-  duration
+  duration,
+  onInfiniteScroll
 }) {
+  const [lastScrollY, setLastScrollY] = useState(0)
   const scrollViewRef = useRef()
   
   let wrapper = null
   let STYLES = {}
+
+  const handleScroll = ({ nativeEvent }) => {
+    const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
+    const isBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 10
+
+    if (isBottom && contentOffset.y > lastScrollY) {
+      if (onInfiniteScroll) {
+        onInfiniteScroll()
+      }
+    }
+
+    setLastScrollY(contentOffset.y)
+  }
 
   if (styles) {
     STYLES = global.$rnStyle(styles)
@@ -39,6 +54,7 @@ export default function BaseDiv ({
 
     : wrapper = scrollable 
       ? <ScrollView
+        onScroll={handleScroll} 
         ref={scrollViewRef}
         onContentSizeChange={
           scrollToBottom 

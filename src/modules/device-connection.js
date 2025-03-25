@@ -4,13 +4,18 @@ export default () => ({
 
   // states
   metaStates: {
-    deviceModal: false
+    deviceModal: false,
+    devices: []
   },
 
   // mutations
   metaMutations: {
     SET_DEVICE_MODAL: (state, { payload }) => {
       state.deviceModal = payload
+    },
+
+    SET_DEVICES: (state, { payload }) => {
+      state.devices = payload.filter(item => item.name)
     }
   },
 

@@ -53,41 +53,35 @@ const DeviceModal = props => {
   )
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={meta.deviceModal}
-    >
-      <SafeAreaView style={modalStyle.container}>
-        <View style={modalStyle.wrapper}>
-        <Button
-          title="Close"
-          onPress={() => {
-            meta.showDeviceModal(false)
-          }}
-        />
-          <Text style={modalStyle.modalTitleText}>
-            Tap on a device to connect
-          </Text>
+    <SafeAreaView style={modalStyle.container}>
+      <View style={modalStyle.wrapper}>
+      <Button
+        title="Close"
+        onPress={() => {
+          meta.showDeviceModal(false)
+        }}
+      />
+        <Text style={modalStyle.modalTitleText}>
+          Tap on a device to connect
+        </Text>
 
-            {
-              devices.length > 0
-                ? <FlatList
-                  contentContainerStyle={modalStyle.modalFlatlistContiner}
-                  data={devices}
-                  renderItem={renderDeviceModalListItem}
-                />
-                : <Text style={{
-                    width: '100%',
-                    textAlign: 'center',
-                    marginTop: 100,
-                    fontSize: 15,
-                    color: 'rgba(0,0,0,.4)'
-                }}>Searching for Printer devices..</Text>
-            }
-        </View>
-      </SafeAreaView>
-    </Modal>
+          {
+            devices.length > 0
+              ? <FlatList
+                contentContainerStyle={modalStyle.modalFlatlistContiner}
+                data={devices}
+                renderItem={renderDeviceModalListItem}
+              />
+              : <Text style={{
+                  width: '100%',
+                  textAlign: 'center',
+                  marginTop: 100,
+                  fontSize: 15,
+                  color: 'rgba(0,0,0,.4)'
+              }}>Searching for Printer devices..</Text>
+          }
+      </View>
+    </SafeAreaView>
   )
 }
 

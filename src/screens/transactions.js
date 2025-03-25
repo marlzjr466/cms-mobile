@@ -10,6 +10,7 @@ import { filters } from '@composable/filters'
 import { useMeta, useModal } from '@hooks'
 
 // components
+import ProductsModal from '@components/home/products'
 import Table from '@components/Table'
 import TransactionModal from '@components/home/transaction-modal'
 import { useComponent } from '@components'
@@ -19,8 +20,12 @@ const {
 
 function Transactions () {
   const { setPage, pagination, sort, page } = filters()
-  const { metaStates, metaActions } = useMeta()
-  const { show } = useModal()
+  const { metaStates, metaActions, metaMutations } = useMeta()
+  const { show, hide } = useModal()
+
+  const products = {
+    ...metaMutations('products', ['SET_INIT_ITEMS', 'SET_ITEMS_CLEAR', 'SET_ITEMS'])
+  }
 
   const transactions = {
     ...metaStates('transactions', ['list', 'count']),
@@ -45,8 +50,8 @@ function Transactions () {
   }, [page])
 
   useEffect(() => {
-    if (!init) {
-      showPatientModal()
+    if (!init && updatedData) {
+      showTxnModal()
     }
   }, [updatedData])
 
@@ -56,9 +61,13 @@ function Transactions () {
         {
           field: 'deleted_at',
           value: 'null'
+        },
+        {
+          field: 'status',
+          value: 'completed'
         }
       ],
-      columns: ['id', 'record_id', 'status', 'amount'],
+      columns: ['id', 'record_id', 'status', 'amount', 'created_at', 'consultation_price', 'products_metadata'],
       aggregate: [
         {
           table: 'records',
@@ -102,7 +111,27 @@ function Transactions () {
     })
   }
 
-  const showPatientModal = () => show(<TransactionModal data={updatedData} forUpdate />)
+  const showTxnModal = () => show(
+    <TransactionModal
+      data={updatedData}
+      onAddProduct={showProductsModal}
+      onCancel={async () => {
+        setUpdatedData(null)
+        products.SET_ITEMS_CLEAR()
+        hide()
+      }}
+      forUpdate
+    />
+  )
+
+  const showProductsModal = () => show(
+    <ProductsModal
+      onHide={showTxnModal}
+      onSelectedItem={item => {
+        products.SET_ITEMS(item)
+      }}
+    />
+  )
 
   return (
     <BaseDiv styles="flex-1 bg-[#f9f9f9] p-[20] flex flex-col gap-[10]">
@@ -115,12 +144,13 @@ function Transactions () {
         itemsPerPage={pagination.rows}
         onCreate={() => {
           if (init) {
-            showPatientModal()
+            showTxnModal()
           } else {
             setUpdatedData(null)
           }
         }}
         onRowClick={row => {
+          products.SET_INIT_ITEMS(row?.products_metadata || [])
           setInit(false)
           setUpdatedData(row)
         }}

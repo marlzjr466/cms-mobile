@@ -9,7 +9,7 @@ export default {
       value: 'pending'
     }
   ],
-  columns: ['id', 'record_id', 'status'],
+  columns: ['id', 'record_id', 'consultation_price', 'status'],
   aggregate: [
     {
       table: 'records',

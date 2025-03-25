@@ -7,7 +7,9 @@ export default () => ({
 
   metaStates: {
     list: [],
-    count: 0
+    count: 0,
+    searchList: [],
+    searchCount: 0
   },
   
   metaMutations: {
@@ -15,6 +17,13 @@ export default () => ({
       if (payload) {
         state.list = payload.list
         state.count = payload.count || 0
+      }
+    },
+
+    SET_SEARCH_LIST: (state, { payload }) => {
+      if (payload) {
+        state.searchList = payload.list
+        state.searchCount = payload.count || 0
       }
     }
   },
@@ -31,6 +40,20 @@ export default () => ({
         const response = await baseApi.get('/patients', { params: { data } })
         
         commit('SET_LIST', response.data)
+      } catch (error) {
+        throw error
+      }
+    },
+    
+    async fetchSearchList ({ commit }, params) {
+      const host = await storage.get('api-host')
+      const baseApi = axios(host)
+
+      try {
+        const data = btoa(JSON.stringify(params))
+        const response = await baseApi.get('/patients', { params: { data } })
+        
+        commit('SET_SEARCH_LIST', response.data)
       } catch (error) {
         throw error
       }

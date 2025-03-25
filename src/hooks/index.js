@@ -8,6 +8,7 @@ import { useNetworkInfo } from "./usetNetworkInfo"
 import { useAddressReachable } from "./useAddressReacheble"
 import { useModal } from "./useModal"
 import { useClickOutside } from "./useClickOutside"
+import { useDevice } from "./useDevice"
 
 export {
   useBLE,
@@ -19,5 +20,6 @@ export {
   useNetworkInfo,
   useAddressReachable,
   useModal,
-  useClickOutside
+  useClickOutside,
+  useDevice
 }

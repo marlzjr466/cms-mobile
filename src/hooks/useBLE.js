@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { PermissionsAndroid, Platform } from "react-native"
 import { BleManager } from "react-native-ble-plx"
 
@@ -9,6 +9,17 @@ function useBLE() {
   const bleManager = useMemo(() => new BleManager(), [])
   const [allDevices, setAllDevices] = useState([])
   const [connectedDevice, setConnectedDevice] = useState(null)
+
+  useEffect(() => {
+    return () => {
+      bleManager.destroy()
+    }
+  }, [])
+
+  const isBluetoothEnabled = async () => {
+    const state = await bleManager.state()
+    return state === "PoweredOn"
+  }
 
   const requestPermissions = async () => {
     if (Platform.OS === "android") {
@@ -43,21 +54,38 @@ function useBLE() {
   const isDuplicteDevice = (devices, nextDevice) =>
     devices.findIndex(device => nextDevice.id === device.id) > -1
 
-  const scanForPeripherals = () =>
+  const scanForPeripherals = async () => {
+    const btEnabled = await isBluetoothEnabled()
+    if (!btEnabled) {
+      console.log("Bluetooth is OFF. Ask user to enable it.")
+      return
+    }
+
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error) {
-        console.log(error)
+        console.log("BLE Scan Error:", error)
+  
+        if (error.errorCode === 1) {
+          console.log("Bluetooth is OFF. Ask user to turn it on.")
+        } else if (error.errorCode === 100) {
+          console.log("BLE is unsupported on this device.")
+        }
+        return
       }
-      if (device && device.name?.includes("Printer")) {
+
+      // console.log('---------', device)
+      // if (device && device.name?.includes("Printer")) {
+      if (device) {
         setAllDevices(prevState => {
           if (!isDuplicteDevice(prevState, device)) {
-            return [...prevState, device]
+            return [...prevState, device].filter(x => x.name)
           }
           
           return prevState
         })
       }
     })
+  }
 
   const connectToDevice = async device => {
     try {

@@ -8,6 +8,7 @@ import styles from '@assets/style'
 // provider
 import AuthProvider from '@providers/auth-provider'
 import ModalProvider from '@providers/modal-provider'
+import DeviceProvider from '@providers/device-provider'
 
 // utilities
 import socket from '@utilities/socket'
@@ -121,9 +122,11 @@ function Main ({ navigation }) {
 export default function Index ({ navigation }) {
   return (
     <AuthProvider>
-      <ModalProvider>
-        <Main navigation={navigation} />
-      </ModalProvider>
+      <DeviceProvider>
+        <ModalProvider>
+          <Main navigation={navigation} />
+        </ModalProvider>
+      </DeviceProvider>
     </AuthProvider>
   )
 }

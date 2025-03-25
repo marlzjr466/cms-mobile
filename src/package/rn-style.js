@@ -61,6 +61,8 @@ function getProperty (property) {
     'w-full': ['width', '100%'],
     'h-full': ['height', '100%'],
     'flex-shrink': ['flexShrink', 1],
+    'flex-wrap': ['flexWrap', 'wrap'],
+    'border-dashed': ['borderStyle', 'dashed'],
 
     // margin
     m: 'margin',
@@ -93,6 +95,12 @@ function getProperty (property) {
     b: 'border',
     bbw: 'borderBottomWidth',
     bbc: 'borderBottomColor',
+    brw: 'borderRightWidth',
+    brc: 'borderRightColor',
+    btw: 'borderTopWidth',
+    btc: 'borderTopColor',
+    blw: 'borderLeftWidth',
+    blc: 'borderLeftColor',
 
     // position
     absolute: ['position', 'absolute'],
@@ -118,6 +126,7 @@ function getProperty (property) {
     fs: 'fontSize',
     zIndex: 'zIndex',
     shadow: 'elevation',
+    lh: 'lineHeight',
     'overflow-hidden': ['overflow', 'hidden'],
     'text-center': ['textAlign', 'center'],
     'text-left': ['textAlign', 'left'],

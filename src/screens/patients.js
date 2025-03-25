@@ -50,10 +50,58 @@ function Patients () {
     }
   }, [updatedData])
 
+  // const loadPatients = async (data = null) => {
+  //   const filters = [
+  //     {
+  //       field: 'deleted_at',
+  //       value: 'null'
+  //     }
+  //   ]
+
+  //   if (data) {
+  //     filters.push(...[
+  //       {
+  //         field: 'first_name',
+  //         operator: 'like',
+  //         value: data
+  //       },
+  //       {
+  //         field: 'last_name',
+  //         operator: 'orlike',
+  //         value: data
+  //       }
+  //     ])
+  //   }
+
+  //   await patients.fetch({
+  //     filters,
+  //     aggregate: [
+  //       {
+  //         table: 'records',
+  //         filters: [
+  //           {
+  //             field: 'patient_id',
+  //             key: 'id'
+  //           }
+  //         ],
+  //         is_first: true,
+  //         columns: ['id', 'created_at'],
+  //         sort
+  //       }
+  //     ],
+  //     is_count: true,
+  //     pagination,
+  //     sort: [
+  //       ...sort,
+  //       { field: 'id', direction: 'desc' }
+  //     ]
+  //   })
+  // }
+
   const loadPatients = async (data = null) => {
     const filters = [
       {
-        field: 'deleted_at',
+        field: 'patients.deleted_at',
         value: 'null'
       }
     ]
@@ -61,12 +109,12 @@ function Patients () {
     if (data) {
       filters.push(...[
         {
-          field: 'first_name',
+          field: 'patients.first_name',
           operator: 'like',
           value: data
         },
         {
-          field: 'last_name',
+          field: 'patients.last_name',
           operator: 'orlike',
           value: data
         }
@@ -75,23 +123,31 @@ function Patients () {
 
     await patients.fetch({
       filters,
-      aggregate: [
+      leftJoin: [
         {
           table: 'records',
-          filters: [
-            {
-              field: 'patient_id',
-              key: 'id'
-            }
-          ],
-          is_first: true,
-          columns: ['id', 'created_at'],
-          sort
+          field: 'records.patient_id',
+          key: 'patients.id'
         }
       ],
+      columns: [
+        'patients.*',
+        {
+          raw: `
+            JSON_OBJECT(
+              'id', records.id,
+              'created_at', records.created_at
+            ) AS records
+          `
+        }
+      ],
+      groupBy: ['patients.id', 'records.id'],
       is_count: true,
       pagination,
-      sort
+      sort: [
+        { field: 'records.created_at', direction: 'desc' },
+        { field: 'patients.id', direction: 'desc' },
+      ]
     })
   }
 
