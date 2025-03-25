@@ -29,7 +29,7 @@ function Settings () {
   const storage = useStorage()
   const { metaMutations, metaStates, metaActions } = useMeta()
   const { isReachable } = useAddressReachable()
-  const { auth, logout } = useAuth()
+  const { auth } = useAuth()
   const { show: showToast } = useToast()
   const { show, hide } = useModal()
   const { allDevices, connectToDevice } = useDevice()
@@ -199,7 +199,6 @@ function Settings () {
               gradient={true}
               gradientColors={['#ffbf6a', '#ff651a']}
               action={async () => {
-                await logout()
                 host.SET_ADDRESS(hostAddress)
               }}
             >
@@ -495,7 +494,6 @@ function Settings () {
                       gradient={true}
                       gradientColors={['#ffbf6a', '#ff651a']}
                       action={async () => {
-                        await logout()
                         host.SET_ADDRESS(`http://${localServer.ipAddress}`)
                         setShowModal(false)
                         setNoServerFound(true)
