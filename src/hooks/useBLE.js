@@ -73,9 +73,7 @@ function useBLE() {
         return
       }
 
-      // console.log('---------', device)
-      // if (device && device.name?.includes("Printer")) {
-      if (device) {
+      if (device && device.name?.includes("Printer")) {
         setAllDevices(prevState => {
           if (!isDuplicteDevice(prevState, device)) {
             return [...prevState, device].filter(x => x.name)
