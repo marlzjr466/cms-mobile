@@ -202,7 +202,7 @@ function ProductsModal ({ onHide, onSelectedItem }) {
                   <BaseButton
                     key={i}
                     styles={`w-[48%] p-[10] bw-[1] ${products.items?.find(x => x.id === product.id) ? 'bc-[#04e88b]' : 'bc-[rgba(0,0,0,.05)]'} br-[10] flex flex-col relative`}
-                    disabled={!product.stock}
+                    // disabled={!product.stock}
                     action={() => {
                       onSelectedItem({
                         id: product.id,

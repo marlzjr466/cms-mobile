@@ -31,6 +31,7 @@ function GenerateQueueNumber ({ number, onGenerate }) {
 
   const [searchString, setSearchString] = useState(null)
   const [selectedPatient, setSelectedPatient] = useState(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const patients = {
     ...metaStates('patients', ['searchList', 'searchCount']),
@@ -74,6 +75,11 @@ function GenerateQueueNumber ({ number, onGenerate }) {
 
   const handleGenerateQueue = async () => {
     try {
+      if (isGenerating) {
+        return
+      }
+
+      setIsGenerating(true)
       const current = await storage.get('current-number')
       const next = Number(current) + 1
 
@@ -93,6 +99,8 @@ function GenerateQueueNumber ({ number, onGenerate }) {
       showToast(`Queue number ${formatQueueNumber(current)} generated`)
     } catch (error) {
       showToast(error.message)
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -192,7 +200,7 @@ function GenerateQueueNumber ({ number, onGenerate }) {
             styles="w-[100] p-[10] flex flex-row items-center justify-center gap-[5] br-[7]"
             gradient={true}
             gradientColors={['#ffbf6a', '#ff651a']}
-            disabled={!selectedPatient}
+            disabled={!selectedPatient || isGenerating}
             action={handleGenerateQueue}
           >
             <BaseText styles="color-[#fff] fs-[13]">

@@ -4,7 +4,12 @@ import socket from '@utilities/socket'
 
 // components
 import { useComponent } from '@components'
+
+import ConfirmAlert from './confirm-alert'
 import Nodata from '@components/Nodata'
+
+// hooks
+import { useModal, useToast, useMeta } from '@hooks'
 
 // images
 import { images } from '@assets/images'
@@ -14,7 +19,38 @@ import { formatQueueNumber } from '@utilities/helper'
 
 
 function InQueue ({ data = [], dataCount }) {
-  const { BaseText, BaseDiv, BaseImage } = useComponent()
+  const { BaseText, BaseDiv, BaseImage, BaseButton } = useComponent()
+  const { metaActions } = useMeta()
+  const { show: showToast } = useToast()
+  const { show, hide } = useModal()
+
+  const queues = {
+    ...metaActions('queues', ['patch'])
+  }
+
+  const handldeCancelQueue = async id => {
+    try {
+      await queues.patch({
+        key: 'id',
+        data: {
+          id,
+          status: 'canceled'
+        }
+      })
+    } catch (error) {
+      showToast(error.message)
+    } finally {
+      showToast('Queue number canceled')
+      hide()
+    }
+  }
+
+  const conFirmAlert = item => show(
+    <ConfirmAlert
+      message={`Cancel queue number ${formatQueueNumber(item.number)}?`}
+      onConfirm={() => handldeCancelQueue(item.id)}
+    />
+  )
   
   return (
     <BaseDiv styles="flex-1 flex flex-col">
@@ -48,7 +84,11 @@ function InQueue ({ data = [], dataCount }) {
         {
           dataCount ? (
             data.map((item, i) => (
-              <BaseDiv key={i} styles="w-full flex flex-row gap-[5] items-center bg-[#fff] h-[45] ph-[10] br-[10] bw-[1] bc-[#f1f1f1]">
+              <BaseButton
+                key={i} 
+                styles="w-full flex flex-row gap-[5] items-center bg-[#fff] h-[45] ph-[10] br-[10] bw-[1] bc-[#f1f1f1]"
+                action={() => conFirmAlert(item)}
+              >
                 <BaseText bold={true} styles="w-[60] color-[#3c4447] fs-[12]">
                   {formatQueueNumber(item.number)}
                 </BaseText>
@@ -69,7 +109,7 @@ function InQueue ({ data = [], dataCount }) {
                 <BaseText bold={true} styles={`w-[70] ml-[auto] text-center fs-[10] ${item.status === 'in-progress' ? 'color-[#00b142] bg-[#e4fced]' : 'color-[#8162e4] bg-[#e9f0fa]'} ph-[10] pv-[5] br-[20]`}>
                   {item.status === 'in-progress' ? 'ongoing' : item.status}
                 </BaseText>
-              </BaseDiv>
+              </BaseButton>
             ))
           ) : <Nodata label="No data in queue" />
         }

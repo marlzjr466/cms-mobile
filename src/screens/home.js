@@ -228,6 +228,7 @@ function Home () {
 
   const conFirmAlert = () => show(
     <ConfirmAlert
+      message="Are you sure to end the queue?"
       onConfirm={() => {
         setStartQueue(false)
         setCurrentQueueNumber(1)

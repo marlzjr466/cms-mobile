@@ -10,13 +10,13 @@ const {
 // hooks
 import { useModal } from '@hooks'
 
-function ConfirmAlert ({ onConfirm }) {
+function ConfirmAlert ({ onConfirm, message }) {
   const { hide } = useModal()
 
   return (
     <BaseDiv styles="bg-[white] w-[350] br-[10] flex flex-col p-[20] gap-[30]">
       <BaseText bold={true} styles="w-full text-center fs-[16]">
-        Are you sure to end the queue?
+        {message}
       </BaseText>
 
       <BaseDiv styles="w-full flex flex-row justify-center gap-[10]">
