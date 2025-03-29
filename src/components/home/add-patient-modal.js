@@ -3,13 +3,15 @@ import moment from 'moment'
 import _ from 'lodash'
 
 import { useComponent } from '@components'
+import Loader from '@components/Loader'
 const {
   BaseText,
   BaseInput,
   BaseButton,
   BaseDiv,
   BaseSelect,
-  BaseDatePicker
+  BaseDatePicker,
+  BaseIcon
 } = useComponent()
 
 // hooks
@@ -21,6 +23,7 @@ function AddPatientModal ({ defaultData = null }) {
   const { show: showToast } = useToast()
   const { metaActions } = useMeta()
 
+  const [isSubmit, setIsSubmit] = useState(false)
   const [payload, setPayload] = useState({
     first_name: defaultData?.first_name || null,
     last_name: defaultData?.last_name || null,
@@ -44,6 +47,11 @@ function AddPatientModal ({ defaultData = null }) {
   }
 
   const handleSubmit = async () => {
+    if (isSubmit) {
+      return true
+    }
+
+    setIsSubmit(true)
     try {
       if (defaultData) {
         await patients.patch({
@@ -62,9 +70,11 @@ function AddPatientModal ({ defaultData = null }) {
       }
 
       showToast(`Patient ${defaultData ? 'updated' : 'added'} successfully!`)
+      setIsSubmit(false)
       resetPayload()
       hide()
     } catch (error) {
+      setIsSubmit(false)
       showToast(error.message)
     }
   }
@@ -175,14 +185,18 @@ function AddPatientModal ({ defaultData = null }) {
             styles="w-[100] p-[10] flex flex-row items-center justify-center gap-[5] br-[7]"
             gradient={true}
             gradientColors={['#ffbf6a', '#ff651a']}
-            disabled={Object.values(payload).some(x => !x)}
+            disabled={isSubmit || Object.values(payload).some(x => !x)}
             action={handleSubmit}
-          >
-            <BaseText styles="color-[#fff] fs-[13]">
-              {
-                defaultData ? 'Update' : 'Submit'
-              }
-            </BaseText>
+          > 
+            {
+              isSubmit ? <Loader /> : (
+                <BaseText styles="color-[#fff] fs-[13]">
+                  {
+                    defaultData ? 'Update' : 'Add'
+                  }
+                </BaseText>
+              )
+            }
           </BaseButton>
         </BaseDiv>
       </BaseDiv>

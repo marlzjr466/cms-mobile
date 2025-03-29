@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 import { useComponent } from '@components'
 import Nodata from '@components/Nodata'
+import Loader from '@components/Loader'
 const {
 	BaseText,
 	BaseInput,
@@ -27,6 +28,7 @@ function TransactionModal ({ data, onAddProduct, onCancel, forUpdate }) {
   const { metaActions, metaStates, metaMutations } = useMeta()
   
   const [amount, setAmount] = useState(data?.amount || 0)
+  const [isProcess, setIsprocess] = useState(false)
 
   const transactions = {
     ...metaActions('transactions', ['patch'])
@@ -39,6 +41,11 @@ function TransactionModal ({ data, onAddProduct, onCancel, forUpdate }) {
   }
 
   const handleProcess = async () => {
+    if (isProcess) {
+      return true
+    }
+
+    setIsprocess(true)
     try {
       let query = []
       if (!forUpdate) {
@@ -69,9 +76,11 @@ function TransactionModal ({ data, onAddProduct, onCancel, forUpdate }) {
 
       onCancel(true)
       setAmount(0)
+      setIsprocess(false)
       showToast('Transaction completed')
     } catch (error) {
       showToast(error.message)
+      setIsprocess(false)
     }
   }
 
@@ -331,13 +340,18 @@ function TransactionModal ({ data, onAddProduct, onCancel, forUpdate }) {
           styles="pv-[10] ph-[15] flex flex-row items-center justify-center gap-[5] br-[7]"
           gradient={true}
           gradientColors={['#ffbf6a', '#ff651a']}
+          disabled={isProcess}
           action={handleProcess}
         >
-          <BaseText styles="color-[#fff] fs-[13]">
           {
-            forUpdate ? 'Update' : 'Place Order'
+            isProcess ? <Loader /> : (
+              <BaseText styles="color-[#fff] fs-[13]">
+                {
+                  forUpdate ? 'Update' : 'Place Order'
+                }
+              </BaseText>
+            )
           }
-          </BaseText>
         </BaseButton>
       </BaseDiv>
 		</BaseDiv>
